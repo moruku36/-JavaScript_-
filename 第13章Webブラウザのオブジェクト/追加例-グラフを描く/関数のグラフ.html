@@ -1,0 +1,35 @@
+<!--
+<プログラムについて>
+	数式を入力してサブウィンドウにグラフを描きます。サブウィンドウに表示するファイルは、drawgraph.htmlです。drawgraph.htmlの中のdraw(formula)関数は、与えられた数式formulaのグラフをcanvas要素に描画します。isProperFormula(formula)関数は、正規表現を使ってformulaが指定したトークン以外を含まないことを確かめています。これは、悪意のあるコードを排除するためです。evalを使って数式の文字列から関数を定義しているため、このような判定が必要です。数式として適切であることを判定しているわけではありません。尚、この例をローカルファイルから開くと、Firefox以外は同一生成元ポリシーが働くため動作しません。２つのファイルをサーバーにアップロードして開いて下さい。
+-->
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title>式を入力して関数のグラフを描く</title>
+		<style>
+			#formula { width: 400px; padding: 5px; }
+		</style>
+		<script>
+			window.onload = function() {
+				// サブウィンドウにdrawgraph.htmlを表示
+				var w = open("drawgraph.html", "グラフ", "width=530, height=580");
+				// サブウィンドウの位置を親の右10pxの位置に移動
+				if( screenX ) { // IE以外
+					w.moveTo(screenX + outerWidth + 10, screenY);
+				} else { // IE
+					w.moveTo(screenLeft + outerWidth + 10, screenTop);
+				}
+				// ボタンをクリックするとサブウィンドウのdraw関数でグラフを描画する
+				document.getElementById("button").onclick = function() {
+					var formula = document.getElementById("formula").value;
+					w.draw(formula);
+				};
+			};
+		</script>
+	</head>
+	<body>
+		<p>xの数式：<input id="formula" type="text" value="x*x"></p>
+		<button id="button">グラフを描く</button>
+	</body>
+</html>

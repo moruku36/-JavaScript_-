@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>テキストファイルを読み出す</title>
+<script>
+	function readTextFile(f, callback) {
+		var reader = new FileReader();	// FileReaderオブジェクトを作成
+		reader.onload = function() {	// onloadイベントハンドラを定義
+			callback(reader.result);	// 読み出したテキストをcallbackに渡す
+		};
+		reader.onerror = function(e) {	// エラーが発生した場合
+			console.log("Error", e);	// ログに残す
+		};
+		reader.readAsText(f);	// ファイルのデータを読み出す
+	}
+	window.onload = function() {
+		var input  = document.getElementById("input");
+		var output = document.getElementById("output");
+		input.onchange = function(e) {
+			var files = e.target.files;	// Fileオブジェクトの配列を取得
+			// テキストファイルであることを確認
+			if( files[0].type.substring(0,5) !== "text/" ) return;
+			// Fileオブジェクトのデータを読み出し、pre要素に書き込む
+			readTextFile(files[0], function(text) {
+				output.innerHTML = text;
+			});
+		};
+	};
+</script>
+</head>
+<body>
+	<input type="file" id="input">
+	<pre id="output"></pre>
+</body>
+</html>

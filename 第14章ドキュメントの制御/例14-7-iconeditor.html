@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>ICON EDITOR</title>
+	<script src="./elt.js"></script>
+	<script>
+		window.onload = function() {
+			createIconEditor(document.body,16,16);
+		};
+		function createIconEditor(parent,nx,ny) {
+			// colorの選択
+			var color = elt("input", {type: "color"});
+			// 全消去ボタン
+			var clear = elt("input", {type: "button", value: "全消去"});
+			clear.onclick = function(e) {
+				cells.forEach(function(td){ td.style.backgroundColor = "white"; });
+			};
+			// エディタ画面のテーブル
+			var table = elt("table");
+			table.style.borderCollapse = "collapse";
+			table.style.marginTop = "5px";
+			var cells = []; // td要素を格納する配列
+			for(var j=0; j<ny; j++) {
+				var tr = elt("tr");
+				table.appendChild(tr);
+				for(var i=0; i<nx; i++) {
+					var td = elt("td");
+					cells.push(td);
+					td.style.width  = td.style.height = "15px";
+					td.style.border = "1px solid gray";
+					tr.appendChild(td);
+					// セルをクリックしたときのイベントハンドラ
+					td.onclick = function changeColor(e) {
+						e.target.style.backgroundColor = color.value;
+					};
+				}
+			}
+			// parentに各要素を挿入
+			parent.appendChild(color);
+			parent.appendChild(clear);
+			parent.appendChild(table);
+		}
+	</script>
+</head>
+<body>
+</body>
+</html>

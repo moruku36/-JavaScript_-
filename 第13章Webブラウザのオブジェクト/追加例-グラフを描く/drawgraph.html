@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title>グラフ</title>
+		<style>
+			#graph { border: solid black 1px; }
+		</style>
+		<script>
+			// formulaからグラフを描く
+			function draw(formula) {
+				// 数式が適切でなければ戻る
+				if(!isProperFormula(formula)) return;
+				// グラフを描くcanvas要素を取得
+				var graph = document.getElementById("graph");
+				// canvasを初期化するおまじない
+				graph.width = graph.width;
+				// canvasの幅と高さ
+				var width  = graph.width;
+				var height = graph.height;
+				// canvasコンテキストを取得
+				g = graph.getContext("2d");
+				// x座標とy座標の範囲
+				var xmin = -5, xmax = 5, ymin = -5, ymax = 5;
+				// 座標値をcanvasの座標に変換する関数
+				function gx(x) { return (x-xmin)/(xmax-xmin)*width; }
+				function gy(y) { return height - (y-ymin)/(ymax-ymin)*height; }
+				// 座標軸と目盛り線を描く
+				drawAxis();
+				// formulaから関数fを定義
+				eval("function f(x) { return "+formula+"; }");
+				// グラフを描く
+				drawGraph();
+				// 座標軸と目盛り線を描く
+				function drawAxis() {
+					// x軸と平行な目盛りを描く
+					g.strokeStyle = "#aaa";
+					for(var x=parseInt(xmin)-1; x<xmax; x++) {
+						g.beginPath();
+						g.moveTo(gx(x),gy(ymin)); g.lineTo(gx(x),gy(ymax));
+						g.stroke();
+					}
+					// y軸と平行な目盛りを描く
+					for(var y=parseInt(ymin)-1; y<ymax; y++) {
+						g.beginPath();
+						g.moveTo(gx(xmin),gy(y)); g.lineTo(gx(xmax),gy(y));
+						g.stroke();
+					}
+					// x-座標軸を描く
+					g.strokeStyle = "#333";
+					g.beginPath();
+					g.moveTo(gx(xmin),gy(0)); g.lineTo(gx(xmax),gy(0));
+					g.stroke();
+					// y-座標軸を描く
+					g.beginPath();
+					g.moveTo(gx(0),gy(ymin)); g.lineTo(gx(0),gy(ymax));
+					g.stroke();
+				}
+				// グラフを描く
+				function drawGraph() {
+					g.strokeStyle = "red";
+					g.lineWidth = 1.5;
+					var N = Math.sqrt(width*width+height*height);
+					var dx = (xmax-xmin)/N;
+					g.beginPath();
+					g.moveTo(gx(xmin),gy(f(xmin)));
+					for(var x=xmin+dx; x<=xmax; x+=dx) {
+						g.lineTo(gx(x),gy(f(x)));
+					}
+					g.stroke();
+				}
+			}
+			// formulaが特定のトークンのみからなることを確かめる
+			function isProperFormula(formula) {
+				var s = formula;
+				// 数式で許されるトークンの配列
+				mathTalkens = [
+					"\\+", "\\-", "\\*", "\\/", "\\%", "\\(", "\\)", "\\,", " ",
+					"Math\\.sqrt", "Math\\.pow", "Math\\.log", "Math\\.abs",
+					"Math\\.cos", "Math\\.sin", "Math\\.tan", "Math\\.exp", "x", "\\d"
+				];
+				// formulaから数式のトークンを空文字で置換する
+				mathTalkens.forEach(function(el) {
+					s = s.replace(new RegExp(el,"g"),"");
+				});
+				// 何も残らなければ問題ないと判断する
+				if( s.length == 0 ) return true;
+				return false;
+			}
+		</script>
+	</head>
+	<body>
+		<canvas id="graph" width=500px height=500px></canvas>
+	</body>
+</html>

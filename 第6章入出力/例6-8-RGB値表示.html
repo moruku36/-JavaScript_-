@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>ピクセルのRGB値</title>
+	<style>
+		canvas { border: 2px solid gray; }
+	</style>
+	<script>
+		window.onload = function() {
+			var canvas = document.getElementById("mycanvas");
+			var ctx = canvas.getContext("2d");
+			// 画像オブジェクトを生成
+			var img = new Image();
+			// 画像読み込み終了時の処理
+			img.onload = function() {
+				// 読み込んだ画像をCanvasに描画
+				ctx.drawImage(img,0,0);
+				// ImageDataオブジェクトを取得
+				// （canvas.widthとcanvas.heightはcanvas要素の幅と高さを格納している）
+				var imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+				// RGBA値を取得するメソッドを追加
+				imageData.getRGBA = function(m,n,i) {
+					return this.data[this.width*4*n + 4*m+i];
+				};
+				var rgb = document.getElementById("rgb");
+				// canvas要素をクリックしたときの処理
+				canvas.onclick = function(event) {	// eventはイベントオブジェクト
+					var x = event.offsetX;	// クリック位置のX座標
+					var y = event.offsetY;	// クリック位置のY座標
+					rgb.innerHTML =  " R:"+to3digit(imageData.getRGBA(x,y,0))
+					               + " G:"+to3digit(imageData.getRGBA(x,y,1))
+					               + " B:"+to3digit(imageData.getRGBA(x,y,2));
+				};
+			};
+			img.src = "./cat.jpg";
+		};
+		// 数値を３桁の文字列に変換する関数
+		function to3digit(n) {
+			return ("000"+n).slice(-3);
+		}
+	</script>
+</head>
+<body>
+	<canvas id="mycanvas" width="640" height="400"></canvas>
+	<div><output id="rgb"></output></div>
+</body>
+</html>

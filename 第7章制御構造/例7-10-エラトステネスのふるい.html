@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>エラトステネスのふるいで双子素数を求める</title>
+</head>
+<body>
+	<script>
+		var n = parseInt(prompt("n?"));
+		// エラトステネスのふるいで素数を求める
+		var p = []; // 以下、iが素数ならp[i]=true、合成数ならp[i]=falseと求める
+		for(var i=2; i<=n; i++) p[i] = true;	// まず、2〜nの整数は全て素数とする
+		var max = Math.floor(Math.sqrt(n));	// 素数xは√nまで行えば十分
+		var x = 2;
+		while(x<=max) {
+			for(var i=2*x; i<=n; i+=x) p[i] = false; // xの倍数は合成数
+			while(!p[++x]) ; // 次の素数を探す
+		}
+		// 双子素数を書き出す
+		for(var i=2; i<=n-2; i++) {
+			if(p[i] && p[i+2]) {
+				document.write(i+","+(i+2)+"<br>");
+			}
+		}
+	</script>
+</body>
+</html>

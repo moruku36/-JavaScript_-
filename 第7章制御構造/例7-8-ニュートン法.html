@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>ニュートン法で平方根を求める</title>
+</head>
+<body>
+	<script>
+		var EPSILON= 1.0e-10;
+		var d,xnew,xold;
+		var a = parseFloat(prompt("正の数を入力して下さい"));
+		xold = ( a>1 )? a : 1.0;
+		do {
+			xnew = xold - ( xold*xold - a )/(2.0*xold);
+			d = (xold - xnew)/xold;
+			xold = xnew;
+		} while( d > EPSILON );
+		document.write("sqrt(" + a + ") = " + xnew);
+	</script>
+</body>
+</html> 

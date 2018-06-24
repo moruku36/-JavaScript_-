@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Canvasの基本</title>
+	<script>
+		window.onload = function() {
+			// canvas要素オブジェクトを取得
+			var canvas = document.getElementById("mycanvas");
+			// canvas描画コンテキストを取得
+			var ctx = canvas.getContext("2d");
+			// 描画する
+			// 座標(50,60)に幅200、高さ100の矩形の枠線を描く
+			ctx.strokeRect(50,60,200,100);
+		}
+	</script>
+</head>
+<body>
+	<canvas id="mycanvas" width="640" height="400"></canvas>
+</body>
+</html>

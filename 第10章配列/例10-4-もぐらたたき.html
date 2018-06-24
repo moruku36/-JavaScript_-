@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>モグラたたきゲーム</title>
+<script>
+// モグラ（要素）を生成して、初期化する関数
+function makeMoles(nx,ny) {
+	// Mapオブジェクトに要素オブジェクトをキーとして要素の状態を記録
+	var molesState = new Map();
+	// 横nx匹、縦ny匹のモグラ（div要素）を生成し、初期化する
+	var W = 50, SPACE = 10;
+	for(var i=0; i<nx; i++) {
+		for(var j=0; j<ny; j++) {
+			// 要素を生成
+			var element = document.createElement("div");
+			// 要素のスタイルを設定
+			element.style.width      = W + "px";
+			element.style.height     = W + "px";
+			element.style.background = "url(./mole.jpg)";
+			element.style.position   = "absolute";
+			element.style.opacity    = 0.2;
+			element.style.transition = "transform 0.5s ease-in-out, opacity 0.5s ease";
+			// BODYのノードリストに登録する
+			document.body.appendChild(element);
+			// 要素を配置
+			element.style.left =   SPACE + i*(W+SPACE) + "px";
+			element.style.top  = 2*SPACE + j*(W+SPACE) + "px";
+			// Mapオブジェクトに要素の状態（座標、不透明度）を記録
+			molesState.set(element,{ x: i, y: j, opacity: 0.2 });
+			// 要素クリック時のイベントハンドラ
+			element.onclick = function clickEventHandler(e) {
+				var element = e.currentTarget;
+				var state = molesState.get(element);
+				// クリック時に不透明度が0.5以上ならば削除する
+				if( state.opacity >= 0.5 ) {
+					document.body.removeChild(element);
+					molesState.delete(element);
+				}
+			};
+		}
+	}
+	return molesState;
+}
+window.onload = function() {
+	var TIME_INTERVAL = 1500, DISPLAY_TIME = 1050;
+	// モグラを生成する
+	var molesState = makeMoles(7,4);
+	// 一定間隔でランダムにモグラを表示させる（不透明度を1にし、上へ移動する）
+	var timer = setInterval(function appearMole() {
+		// モグラがいなくなったらゲームを終了する
+		if( molesState.size == 0) {
+			clearInterval(timer);
+			document.body.innerHTML = "game over";
+			return;
+		}
+		// 存在するモグラをランダムに選択
+		var n = Math.floor(Math.random()*molesState.size);
+		var elements = molesState.keys();
+		var count = 0;
+		for(var element of elements) {
+			if( count++ == n ) break;
+		}
+		var state = molesState.get(element);
+		// 不透明度を1にして、上に10px移動させて、モグラを表示させる
+		element.style.opacity = 1;
+		state.opacity = 1;
+		element.style.transform = "translateY(-10px)";
+		// 一定時間後に不透明度と移動を元に戻す
+		setTimeout(function hideMole() {
+			element.style.opacity = 0.2;
+			state.opacity = 0.2;
+			element.style.transform = "translateY(0)";
+		}, DISPLAY_TIME);
+	}, TIME_INTERVAL);
+};
+</script>
+</head>
+<body></body>
+</html>

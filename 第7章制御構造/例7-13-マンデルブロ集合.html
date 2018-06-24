@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>マンデルブロ集合</title>
+	<script>
+		window.onload = function() {
+			var canvas = document.getElementById("mycanvas");
+			var ctx    = canvas.getContext("2d");
+			var width  = canvas.width;
+			var height = canvas.height;
+			// 中心点を設定して描画
+			var xc = -0.6, yc = 0;
+			draw();
+			// 描画ボタンをクリックして描画
+			document.getElementById("button").onclick = draw;
+			// 中心座標をマウスでクリックして設定
+			document.getElementById("mycanvas").onclick = function(event) {
+				var ix = event.offsetX;
+				var iy = event.offsetY;
+				var mag  = parseFloat(document.getElementById("magnification").value);
+				xc += (2*ix/width - 1)/mag;
+				yc += (2*iy-height)/mag/width;
+				draw();
+			};
+			// 設定を読込み描画する関数
+			function draw() {
+				// 倍率
+				var mag   = document.getElementById("magnification").value;
+				// 最大繰り返し数
+				var maxit = document.getElementById("maxit").value;
+				// 中心座標を表示
+				displayCenter(xc,yc);
+				// マンデルブロ集合を描画
+				mandelbrot(ctx,xc,yc,mag,maxit);
+			}
+		};
+		// 中心座標を表示する関数
+		function displayCenter(xc,yc) {
+			document.getElementById("xc").innerHTML = xc.toFixed(3);
+			document.getElementById("yc").innerHTML = yc.toFixed(3);
+		}
+		// mandelbrot集合を描く関数
+		//   c：canvasの描画コンテキスト
+		//   xc,yc：中心座標
+		//   mag：拡大率
+		//   maxit：最大の繰り返し数
+		function mandelbrot(c,xc,yc,mag,maxit) {
+			var w    = c.canvas.width;
+			var h    = c.canvas.height;
+			var xmin = xc - 1/mag;
+			var xmax = xc + 1/mag;
+			var ymin = yc - (xmax-xmin)*h/w/2;
+			var ymax = yc + (xmax-xmin)*h/w/2;
+			var dx   = (xmax-xmin)/w;
+			var dy   = (ymax-ymin)/h;
+			// 色分け用の色（半径2の中にいた回数で色分けする）
+			var color = [];
+			color[0] = "black";	// マンデルブロ集合の点の色を黒とする
+			var L=255, dL = 255/maxit;
+			for(var i=maxit; i>0; i--) {
+				color[i] = "rgb(255,"+Math.floor(L)+",255)"; L-=dL;
+			}
+			// X軸方向のピクセルのスキャン
+			for(var i=0; i<w; i++) {
+				var x = xmin + i*dx;
+				// Y方向のピクセルのスキャン
+				for(var j=0; j<h; j++) {
+					var y = ymin + j*dy;
+					// z1=x+iy
+					var a = x, b = y;
+					var a2 = a*a, b2 = b*b;
+					// 半径2の中にmaxit回以内いる場合継続
+					for(var count=maxit; a2+b2<=4 && count; count--) {
+						// z_n+1 = z_n^2 +x+iy
+						b = 2*a*b + y; a = a2 - b2 + x;
+						a2 = a*a; b2 = b*b;
+					}
+					// countの値に応じて色分けして点を描画する
+					c.fillStyle = color[count];
+					c.fillRect(i,j,1,1);
+				}
+			}
+		}
+	</script>
+	<style>
+		#mycanvas { border: 1px solid gray; }
+		input { margin: 0 10px; width: 60px; text-align: center; }
+		div { font-size: small; margin-bottom: 5px; }
+	</style>
+</head>
+<body>
+	<canvas id="mycanvas" width="800" height="640"></canvas>
+	<div>中心座標(<span id="xc"></span>,<span id="yc"></span>) ← マウスクリックで設定</div>
+	<div>
+		<label>倍率:<input id="magnification" type="number" value="0.65"></label>
+		<label>最大繰り返し数:<input id="maxit" type="number" value="60"></label>
+		<input id="button" type="button" value="描画">
+	</div>
+</body>

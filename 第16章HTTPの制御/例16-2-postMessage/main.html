@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>postMessageの例</title>
+	<script>
+		window.onload = function() {
+			// iframe要素に表示されるページのWindowオブジェクトを取得
+			var frameWindow = document.getElementById("frame").contentWindow;
+			// メッセージ入力用の要素、送信ボタン要素オブジェクトを取得
+			var message = document.getElementById("message");
+			var button  = document.getElementById("button");
+			// 送信先のオリジン
+			var targetOrigin = "/";　// 同じサイトに送信
+			// buttonをクリックしたらメッセージを送信する
+			button.addEventListener("click", function() {
+				frameWindow.postMessage(message.value, targetOrigin);
+			}, false);
+		};
+	</script>
+</head>
+<body>
+	<p>
+		<input type="text" id="message" size="60">
+		<input type="button" value="送信" id="button">
+	</p>
+	<iframe src="other.html" id="frame" width="300px" height="200px"></iframe>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!--
+<プログラムの説明>
+	Deckコンストラクタで、トランプの組を生成してシャッフルし、dealメソッドでデッキから５枚のカードを配り、それらをdisplayCards関数でHTML要素として生成して、画面に表示します。カードを表す要素オブジェクトにはクリック時のイベントハンドラを登録して、クリックするとY軸の周りに180°回転するようにしています。displayCards関数では、elt関数を使って要素を生成しています。また、カードが表向きか裏向きかの情報は、カードを表す要素オブジェクトに新しいプロパティ（isFront）を追加して、そこに記録しています。
+
+	このプログラムでは、次のファイルを用います。
+		elt.js ： 要素を生成する関数eltを定義
+		card.js： トランプを生成するコンストラクタCardと新しいトランプの組み（デッキ）を生成するコンストラクタDeckを定義
+		card_style.css： 表裏のあるトランプのカードを定義するスタイルシート
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>トランプのカードをめくる</title>
+<link href="card_style.css" rel="stylesheet" type="text/css">
+<script src="./elt.js"></script>
+<script src="./card.js"></script>
+<script>
+	// カード配列を要素として生成し表示する
+	function displayCards(cards) {
+		//　カードを横に並べて初期化する
+		var W = 60, H = 100, SPACE = 20;
+		for(var i=0, ix=0, iy=0; i<cards.length; i++) {
+			// カードの表面の要素を生成
+			var front = elt("div", {class: "front"}, cards[i].symbol);
+			// カードの裏面の要素を生成
+			var back  = elt("div", {class: "back"});
+			// カードの要素を生成
+			var card = elt("div", {class: "card"}, front, back);
+			// BODYのノードリストに登録する
+			document.body.appendChild(card);
+			// カードの位置を設定
+			card.style.left = SPACE + ix*(W+SPACE) + "px";
+			card.style.top  = SPACE + iy*(H+SPACE) + "px"; 
+			ix++;
+			if( i%10 == 9 ) {
+				ix = 0; iy++;
+			}
+			// カードの文字色を設定
+			card.style.color = cards[i].color;
+			// 要素オブジェクトに表裏を表すプロパティを追加
+			card.isFront = false;
+			// カーソルを設定
+			card.style.cursor = "pointer";
+			// カードをクリックしたときの動作を登録
+			card.onclick = function clickEventHandler(e) {
+				var card = e.currentTarget;
+				if( card.isFront ) {
+					card.style.transform = "rotateY(0)";
+				} else {
+					card.style.transform = "rotateY(180deg)";
+				}
+				card.isFront = !card.isFront;
+			};
+		}
+	}
+	// 文書読み込み終了時に実行
+	window.onload = function() {
+		// 新しいデッキを生成し、シャッフルする
+		var deck = (new Deck()).shuffle();
+		// デッキから5枚配る
+		var hand = deck.deal(5);
+		// 配られた手を画面に表示する
+		displayCards(hand);	
+	};
+</script>
+</head>
+<body></body>
+</html>

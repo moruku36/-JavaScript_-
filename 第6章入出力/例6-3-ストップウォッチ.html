@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>ストップウォッチ</title>
+	<script>
+		window.onload = function() {
+			var startButton = document.getElementById("start");		// startボタン要素
+			var stopButton  = document.getElementById("stop");		// stopボタン要素
+			var display     = document.getElementById("display");	// 表示用の要素
+			var startTime,timer;
+			startButton.onclick = start;	// stratボタンを有効にする
+			function start() {
+				startButton.onclick = null;	// startボタンを無効にする
+				stopButton.onclick  = stop;	// stopボタンを有効にする
+				startTime = new Date();
+				// 0.01秒毎に経過時間を表示する
+				timer = setInterval(function() {
+					var now = new Date();
+					// #displayに経過時間を書き込む
+					display.innerHTML = ((now - startTime)/1000).toFixed(2);
+				},10);
+			}
+			function stop() {
+				clearInterval(timer);			// タイマーを解除
+				startButton.onclick = start;	// startボタンを有効にする
+			}
+		};
+	</script>
+</head>
+<body>
+	<p id="display">0.00</p>
+	<input id="start" type="button" value="start">
+	<input id="stop" type="button" value="stop">
+</body>
+</html>

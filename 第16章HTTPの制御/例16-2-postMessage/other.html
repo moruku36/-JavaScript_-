@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>別ドメインのページ</title>
+	<script>
+		window.onload = function() {
+			var result = document.getElementById("display");
+			window.addEventListener("message", function(e) {
+				// オリジンは同じであるとする（"/"は使用できないことに注意）
+				var sourceOrigin = location.origin;
+				// 送信元のオリジンがこのサイトと同一オリジンであるかを検証
+				if( e.origin !== sourceOrigin ) return;
+				display.textContent = e.data;
+			}, false);
+		}
+	</script>
+</head>
+<body>
+	<div id="display"></div>
+</body>
+</html>

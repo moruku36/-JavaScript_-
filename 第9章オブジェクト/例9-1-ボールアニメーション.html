@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>ボールアニメーション</title>
+	<script>
+		window.onload = function() {
+			// 各種パラメータ
+			var NBALL         = 200;	// ボールの数
+			var R             = 5;		// ボールの半径
+			var TIME_INTERVAL = 33;		// アニメーションの時間間隔（ms単位）
+			var BACK_ALPHA    = 0.3;	// 背景のα値
+			// canvasコンテキストを得る
+			var canvas = document.getElementById('mycanvas');
+			var ctx = canvas.getContext('2d');
+			// 壁を表すオブジェクト
+			var wall = { left: 0, right: canvas.width, top: 0, bottom: canvas.height };
+			// ボールオブジェクトをNBALL個作成し、配列ballsに格納
+			var balls = [];
+			for(var i=0; i<NBALL; i++) {
+				balls[i] = new Ball(wall.right/2,wall.bottom/2,R);
+				balls[i].setVelocityAsRandom(2,7).setColorAsRandom(50,255);
+			}
+			// アニメーションを行う：TIME_INTERVAL(ms）毎にdrawFrameを実行
+			setInterval(drawFrame, TIME_INTERVAL);
+			// アニメーションのフレームを描画
+			function drawFrame() {
+				// 背景を黒で塗る
+				ctx.fillStyle = 'rgba(0,0,0,'+BACK_ALPHA+')';
+				ctx.fillRect(0,0,canvas.width,canvas.height);
+				// ボールの位置を更新して描画
+				for(i=0; i<balls.length; i++) {
+					balls[i].move().collisionWall(wall).draw(ctx);
+				}
+			}
+		};
+		// Ballコンストラクタ
+		function Ball(x,y,r,vx,vy,color) {
+			this.x = x;			// ボールのx座標
+			this.y = y;			// ボールのy座標
+			this.r = r;			// ボールの半径
+			this.vx = vx;		// ボールの速度のx成分
+			this.vy = vy;		// ボールの速度のy成分
+			this.color = color;	// ボールの色
+		}
+		// Ballコンストラクタのプロトタイプ
+		Ball.prototype = {
+			// 速度をランダムに設定する
+			setVelocityAsRandom: function(vmin,vmax) {
+				var v = vmin + Math.random()*(vmax-vmin);
+				var t = 2*Math.PI*Math.random();
+				this.vx = v*Math.cos(t);
+				this.vy = v*Math.sin(t);
+				return this;
+			},
+			// 色をランダムに設定する
+			setColorAsRandom: function(lmin,lmax) {
+				var R = Math.floor(lmin+Math.random()*(lmax-lmin));
+				var G = Math.floor(lmin+Math.random()*(lmax-lmin));
+				var B = Math.floor(lmin+Math.random()*(lmax-lmin));
+				this.color = 'rgb('+R+','+G+','+B+')';
+				return this;
+			},
+			// ボールを描く
+			draw: function(ctx) {
+				ctx.fillStyle = this.color;
+				ctx.beginPath();
+				ctx.arc(this.x,this.y,this.r,0,2*Math.PI,true);
+				ctx.fill();
+				return this;
+			},
+			// 位置を更新
+			move: function() {
+				this.x += this.vx;
+				this.y += this.vy;
+				return this;
+			},
+			// 壁との衝突
+			collisionWall: function(wall) {
+				if( this.x - this.r < wall.left ) { // 左方向の壁と衝突
+					this.x = wall.left + this.r;
+					if( this.vx < 0 ) this.vx *= -1;
+				}
+				if( this.x + this.r > wall.right ) { // 右方向の壁と衝突
+					this.x = wall.right - this.r;
+					if( this.vx > 0 ) this.vx *= -1;
+				}
+				if( this.y - this.r < wall.top ) { // 上方向の壁と衝突
+					this.y = wall.top + this.r;
+					if( this.vy < 0 ) this.vy *= -1;
+				}
+				if( this.y + this.r > wall.bottom ) { // 下方向の壁と衝突
+					this.y = wall.bottom - this.r;
+					if( this.vy > 0 ) this.vy *= -1;
+				}
+				return this;
+			}
+		};
+	</script>
+</head>
+<body>
+	<canvas id="mycanvas" width=640 height=480></canvas>
+</body>
+</html>

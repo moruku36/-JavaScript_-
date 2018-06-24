@@ -1,0 +1,90 @@
+<!--
+<プログラムについて>
+	エラトステネスのふるいにより、ガウス素数を求めてプロットしています。プロットした模様は、床のタイル貼りやテーブルクロスにも使われています。
+	Int8ArrayをArrayに置きかえても動作します。Arrayで生成した場合も、最近の実行環境は最適化されて高速になっていますが、それでも型付き配列を用いるよりは最大1.5倍ほど低速です。また、Arrayで生成した配列は１要素あたり64ビット、Int8Arrayで生成した配列は１要素あたり8ビットですので、メモリの消費量は型付き配列の方が1/8倍となっています。
+<Gauss素数>
+	実部と虚部が共に整数であるような複素数を、ガウス整数といいます。ガウス整数の内、±1と±i（ iは虚数単位）以外の２つのガウス整数の積で表せないものを、ガウス素数といいます。例えば、2は素数ですが、2 = (1+i)(1-i)と因数分解されるためガウス素数ではありません。
+-->
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Gauss素数</title>
+	<script>
+		// ２次元配列を１次元化して利用するためのクロージャを生成
+		function create2dArray(n) {
+			var array = new Int8Array(n*n);
+			return {
+				set: function(i,j,value) {
+					array[n*i+j] = value;
+				},
+				get: function(i,j) {
+					return array[n*i+j];
+				}
+			};
+		}
+		// エラトステネスのふるいを用い、第１象限内で半径n以内のガウス素数を求める
+		function gaussianPrimes(n) {
+			// ２次元配列を生成：m.get(x,y)が1ならGauss素数、0ならGauss素数でない
+			var m = create2dArray(n+1);
+			// 全てGauss素数とする
+			for(var i=0; i<=n; i++) {
+				for(var j=0; j<=n; j++) {
+					m.set(i,j,1);
+				}
+			}
+			// 0, 1, iはGauss素数でない
+			m.set(0,0,0); m.set(1,0,0); m.set(0,1,0);
+			// Gauss素数(a+bi)の自明でない(c+di)倍はGauss素数でない
+			// (a+bi)(c+di) = c(a+bi) + d(-b+ai) = p + qi + d(-b+ai) = x + yi
+			// a,bは√nまで行えば十分
+			var sqrtn = Math.sqrt(Math.floor(n));
+			for(var a=1; a<=sqrtn; a++) {
+				for(var b=0; b<=sqrtn; b++) {
+					if( m.get(a,b) ) {
+						// c>0のループ（c<0の場合は第１象限の外に出るため除外）
+						// p = ca, q = cb (c=1,2,...)
+						var p = a, q = b;
+						do {
+							// dのループ：x = p - db, y = q + da（d!=0)
+							// d>0のループ（第１象限内）
+							var x = p, y = q;
+							do {
+								m.set(x,y,0);
+							} while( (x-=b)>=0 && (y+=a)<=n );
+							// d<0のループ（第１象限内）
+							x = p; y = q;
+							do {
+								m.set(x,y,0);
+							} while( (x+=b)<=n && (y-=a)>=0 );
+							p += a; q += b;
+						} while( p<=n );
+						m.set(a,b,1); // a+biでのmの値を0としているので1に戻す
+					}
+				}
+			}
+			return m;
+		}
+		window.onload = function() {
+			var canvas = document.getElementById("mycanvas");
+			var ctx = canvas.getContext("2d");
+			var scale = 4;	// 拡大率
+			var N = Math.floor(ctx.canvas.width/scale/2); // 実軸・虚数軸の最大値
+			var R = Math.floor(Math.sqrt(2)*N); // 半径√2xNまで調べる
+			// 第１象限内で半径R以内のGauss素数を求める
+			var a = gaussianPrimes(R);
+			// Gauss素数をCanvasにプロットする
+			for(var i=-N; i<=N; i++) {
+				for(var j=-N; j<=N; j++) {
+					if( a.get(Math.abs(i),Math.abs(j)) ) {
+						ctx.fillRect(scale*(i+N)-scale/2,scale*(j+N)-scale/2,scale,scale);
+					}
+				}
+			}
+		};
+	</script>
+</head>
+<body>
+	<canvas id="mycanvas" width="600" height="600"></canvas>
+</body>
+</html>

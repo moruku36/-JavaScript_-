@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>ボックスをドラッグ</title>
+	<script src="./elt.js"></script>
+	<script>
+		window.onload = function() {
+			// ボックスを生成
+			var box = elt("div", null, "JavaScript");
+			document.body.appendChild(box);
+			// プレスした点のボックスの原点に対する相対位置を納める
+			var boxOffsetX,boxOffsetY;
+			// ボックスの設定
+			box.style.display = "inline-block";
+			box.style.position = "absolute";
+			box.style.padding = "10px";
+			box.style.backgroundColor = "blue";
+			box.style.color = "white";
+			box.style.cursor = "pointer";
+			// mousedownイベントリスナを登録
+			box.addEventListener("mousedown", function mouseDownListener(e) {
+				// mousemoveイベントリスナを登録
+				document.addEventListener("mousemove", mouseMoveListener, false);
+				// プレス時の相対位置を記憶
+				boxOffsetX = e.offsetX; boxOffsetY = e.offsetY;
+			},false);
+			// mouseupイベントリスナを登録
+			document.addEventListener("mouseup", function mouseUpListener(e) {
+				// mousemove時のイベントリスナを削除
+				document.removeEventListener("mousemove", mouseMoveListener, false);
+			},false);
+			// mousemoveイベントリスナ
+			function mouseMoveListener(e) {
+				// マウスでプレスした位置をドラッグする
+				box.style.left = e.pageX - boxOffsetX + "px";
+				box.style.top  = e.pageY - boxOffsetY + "px";
+			}
+		};
+	</script>
+</head>
+<body>
+</body>
+</html>

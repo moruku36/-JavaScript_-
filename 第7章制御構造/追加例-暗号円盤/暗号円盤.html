@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>円盤暗号</title>
+	<script>
+		window.onload = function() {
+			var enscriptor = Enscriptor();
+			// 平文を暗号化
+			document.getElementById("cipher").onclick = function() {
+				var keyword = document.getElementById("keyword").value;
+				var plaintext = document.getElementById("plaintext").value;
+				var ciphertext = document.getElementById("ciphertext");
+				ciphertext.value = enscriptor.encrypt(plaintext,keyword,true);
+			};
+			// 暗号文を復号化
+			document.getElementById("decipher").onclick = function() {
+				var keyword = document.getElementById("keyword").value;
+				var plaintext = document.getElementById("plaintext");
+				var ciphertext = document.getElementById("ciphertext").value;
+				plaintext.value = enscriptor.encrypt(ciphertext,keyword,false);
+			};
+		};
+		/*
+		 * 暗号器オブジェクトを生成するファクトリ関数
+		 *   obj.chars: 使用する文字のリスト
+		 *   obj.nchars: 使用する文字の数（char配列の長さ）
+		 *   obj.numberOf(ch): 文字chが配列charの何番目の要素かを返すメソッド
+		 *   obj.shift(ch,n): 文字chをnだけシフトした文字を返すメソッド
+		 *   obj.encrypt(text,keyword,encription): 円盤暗号で暗号化するメソッド
+		*/
+		function Enscriptor() {
+			var obj = {};
+			var N_ALPHABET = 26;	// アルファベットの文字数
+			var extraCharactors = [" ",".","?","!","%","#","'","&","$","@",":","/"];
+									// アルファベット・数値以外の文字のリスト
+			obj.chars = [];
+			// charsリストにアルファベットを追加
+			for(var c="a".charCodeAt(0); c<="z".charCodeAt(0); c++) {
+				obj.chars.push(String.fromCharCode(c));
+			}
+			for(var c="A".charCodeAt(0); c<="Z".charCodeAt(0); c++) {
+				obj.chars.push(String.fromCharCode(c));
+			}
+			// charsリストに数記号を追加
+			for(var d=0; d<=9; d++) {
+				obj.chars.push(d.toString());
+			}
+			// charsリストにアルファベット・数値以外の文字を追加
+			for(var j=0; j<extraCharactors.length; j++) {
+				obj.chars.push(extraCharactors[j]);
+			}
+			// charsリストの文字数
+			obj.nchars = obj.chars.length;
+			// 文字chのcharsにおける要素番号を返すメソッド（chがcharsにない場合はnullを返す）
+			obj.numberOf = function(ch) {
+				var code = ch.charCodeAt(0);
+				if( code>="a".charCodeAt(0) && code<="z".charCodeAt(0)) {
+					return code - "a".charCodeAt(0);
+				} else if(code>="A".charCodeAt(0) && code<="Z".charCodeAt(0)) {
+					return N_ALPHABET + code - "A".charCodeAt(0);
+				} else if(code>="0".charCodeAt(0) && code<="9".charCodeAt(0)) {
+					return 2*N_ALPHABET + code - "0".charCodeAt(0); 
+				} else {
+					for(var k=0; k<extraCharactors.length; k++) {
+						if( ch == extraCharactors[k] ) {
+							return 2*N_ALPHABET + 10 + k;
+						}
+					}
+					return null;
+				}
+			};
+			// 文字chをnだけシフトした文字を返すメソッド（chがcharsにない場合はchを返す）
+			obj.shift = function(ch,n) {
+				var num = this.numberOf(ch);
+				if( num == null ) return ch;
+				num = (num + n + this.nchars)%this.nchars;
+				return this.chars[num];
+			};
+			// 暗号円盤による暗号化を行うメソッド
+			//   text: 暗号化/復号化する文字列
+			//   keyword: キーワード
+			//   encription: trueで暗号化、falseで復号化
+			obj.encrypt = function(text,keyword,encription) {
+				var cipherText = "";
+				var nkey = keyword.length;
+				for(var i=0, ikey=0; i<text.length; i++, ikey++) {
+					ikey %= nkey;
+					var nshift = this.numberOf(keyword[ikey]);
+					if(!encription) nshift *= -1;
+					cipherText += this.shift(text[i],nshift);
+				}
+				return cipherText;
+			};
+			return obj;
+		}
+	</script>
+	<style>
+		p { font-size: smaller; }
+		input { height: 20px; }
+		#plaintext,#ciphertext { width: 500px; }
+	</style>
+</head>
+<body>
+	<h2>暗号円盤による暗号化</h2>
+	<p>キーワード：<input type="text" id="keyword"></p>
+	<p>平　文：<input type="text" id="plaintext"></p>
+	<p>暗号文：<input type="text" id="ciphertext"></p>
+	<input type="button" id="cipher" value="暗号化">
+	<input type="button" id="decipher" value="復号化">
+</body>
+</html>

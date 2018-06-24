@@ -1,0 +1,51 @@
+<!--
+<プログラムについて>
+このプログラムは、再帰関数の利用例です。Canvasを用いてコッホ（Koch）曲線を描きます。
+<コッホ曲線>
+ある向きに距離dだけ進むべきところを、まずd/3だけ進み、次に左に60゜曲がってd/3だけ進み、さら右に120゜曲がってd/3だけ進み、最後に左に60゜曲がってd/3進むことにすれば、到達点は同じですが道のりは4/3倍となります。こうしてできた４つの短い線分のおのおのについて、同じことを無限に繰り返します。こうしてできる曲線はフラクタル構造を持ちコッホ曲線と呼ばれます。
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>Koch曲線</title>
+	<script>
+		function koch(c,n,x,y,L,color) {
+			var deg = Math.PI/180;
+			c.strokeStyle = color;
+			c.beginPath();
+			c.moveTo(x,y);
+			hat(n,x,y,0,L);
+			c.stroke();
+			// 線分を折れ線で再帰的に描く関数
+			//   n：階層、(x,y)：始点、t：描く方向の角度、L：線分の長さ
+			function hat(n,x,y,t,L) {
+				var p;
+				if( n==0 ) {	// n=0なら直線を描く
+					p = { x: x+L*Math.cos(t), y: y+L*Math.sin(t) };
+					c.lineTo(p.x,p.y);
+				} else {		// そうでないなら、nを１つ減らして折れ線で置き換える
+					p = hat(n-1,x  ,y  ,t       ,L/3);	// L/3進み
+					p = hat(n-1,p.x,p.y,t-60*deg,L/3);	// 左に60°曲がってL/3進み
+					p = hat(n-1,p.x,p.y,t+60*deg,L/3);	// 右に120°曲がってL/3進み
+					p = hat(n-1,p.x,p.y,t       ,L/3);	// 左に60°曲がってL/3進む
+				}
+				return p;
+			}
+		}
+		window.onload = function() {
+			var canvas = document.getElementById("mycanvas");
+			var ctx = canvas.getContext("2d");
+			koch(ctx,0,20,150,350,"blue");
+			koch(ctx,1,420,150,350,"blue");
+			koch(ctx,2,20,350,350,"blue");
+			koch(ctx,3,420,350,350,"blue");
+			koch(ctx,4,20,550,350,"blue");
+			koch(ctx,5,420,550,350,"blue");
+		};
+	</script>
+</head>
+<body>
+	<canvas id="mycanvas" width=800 height=800></canvas>
+</body>
+</html>

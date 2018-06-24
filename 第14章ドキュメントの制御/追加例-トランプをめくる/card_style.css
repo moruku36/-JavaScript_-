@@ -1,0 +1,39 @@
+/*
+  表と裏のある３次元のトランプのカードを定義するCSSのスタイルです。
+  １枚のカードを表す要素がdiv.cardで、その子要素として表面を表すdiv.frontと
+  裏面を表すdiv.backを配置します。
+  div.frontとdiv.backは絶対配置で親要素と同じ位置に配置しています。
+  div.frontはtransformプロパティでY軸の周りに180°回転して裏を向くようにしています。
+  div.cardをtransformプロパティで回転すれば、div.frontとdiv.backも一緒に回転します。
+  このとき、transitionプロパティを指定して、滑らかな回転のアニメーションを行うようにしています。
+*/
+.card {
+	position: absolute;
+	margin: 10px auto;
+	width: 64px;
+	height: 84px;
+	transform-style: preserve-3d;
+	transition: transform 1s ease-in-out;
+}
+.card div {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 60px;
+	height: 80px;
+	border: 2px solid gray;
+	border-radius: 6px;
+	line-height: 80px;
+	font-size: 1.1em;
+	text-align: center;
+	backface-visibility: hidden;
+}
+.front {
+	background-color: white;
+	transform: rotateY(180deg);
+}
+.back {
+	background-color: pink;
+}
+.red { color: red; }
+.black { color: black; }

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>textContent関数の使用例</title>
+	<script>
+		window.onload = function(){
+			var para = document.getElementById("crads");
+			console.log(textContent(para));
+		};
+		function textContent(element) {
+			var content = element.textContent;
+			if( content !== undefined ) return content;
+			return element.innerText;
+		}
+	</script>
+</head>
+<body>
+	<h1>ハート</h1>
+	<p id="cards">&hearts;ハートは、<em>僧侶</em>を表します。</p>
+</body>
+</html>

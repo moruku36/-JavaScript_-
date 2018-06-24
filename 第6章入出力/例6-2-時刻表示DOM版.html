@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>時刻をコンソールに表示</title>
+	<script>
+		function displayTime() {
+			var d = new Date();
+			console.log("現在、" + d.toLocaleString() + "です。");
+		}
+		// ① Windowオブジェクトのonloadプロパティに関数を設定する
+		// この関数は文書読み込み終了時に実行される
+		window.onload = function() {
+			// ② input要素オブジェクトを取得する
+			var button = document.getElementById("button");
+			// ③ input要素に対してクリックしたときのイベントハンドラを登録する
+			button.onclick = displayTime;
+		};
+	</script>
+</head>
+<body>
+	<input type="button" value="click" id="button">
+</body>
+</html>
